@@ -1,11 +1,13 @@
 package com.qxz.accounting.controller;
 
 import com.qxz.accounting.converter.c2s.UserInfoC2SConverter;
+import com.qxz.accounting.exception.InvalidParameterException;
 import com.qxz.accounting.manager.UserInfoManager;
 import com.qxz.accounting.model.service.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +28,12 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public UserInfo getUserInfoByUserId(@PathVariable("id") Long userId) {
+    public ResponseEntity<UserInfo> getUserInfoByUserId(@PathVariable("id") Long userId) {
         log.info("userId : " + userId);
+        if (userId<=0L){
+            throw new InvalidParameterException("无效的用户ID");
+        }
         val userInfo = userInfoManager.getUserInfoByUserId(userId);
-        return userInfoC2SConverter.convert(userInfo);
+        return ResponseEntity.ok(userInfoC2SConverter.convert(userInfo));
     }
 }
